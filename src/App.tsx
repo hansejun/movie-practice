@@ -3,11 +3,13 @@ import Home from "./Routes/Home";
 import Search from "./Routes/Search";
 import Tv from "./Routes/Tv";
 import Header from "./components/Header";
+import Movie from "./Routes/Movie";
 function App() {
   return (
     <BrowserRouter>
       <Header />
       <Routes>
+        <Route path="/movie" element={<Movie />} />
         <Route path="/tv" element={<Tv />} />
         <Route path="/search" element={<Search />} />
         <Route path="/" element={<Home />}>

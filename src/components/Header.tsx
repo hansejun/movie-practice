@@ -1,23 +1,26 @@
 import styled from "styled-components";
-import { motion, useAnimation } from "framer-motion";
-import { Link } from "react-router-dom";
-import { white } from "jest-matcher-utils/node_modules/chalk";
+import { motion, useAnimation, useViewportScroll } from "framer-motion";
+import { Link, useMatch } from "react-router-dom";
 import { useState } from "react";
+import { useEffect } from "react";
 const Nav = styled(motion.nav)`
+  height: 70px;
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 2.5fr;
   align-items: center;
   position: fixed;
   width: 100%;
   top: 0;
   font-size: 14px;
-  padding: 20px 3vw;
+
+  padding: 0 3vw;
   color: white;
   z-index: 99;
   h1 {
     font-size: 26px;
     font-weight: 500;
   }
+  z-index: 300;
 `;
 
 const NavItem = styled.div`
@@ -47,9 +50,23 @@ const Search = styled.form`
     height: 25px;
   }
   position: relative;
-  justify-self: end;
 `;
-const SearchInput = styled(motion.input)``;
+const SearchSvg = styled(motion.svg)`
+  cursor: pointer;
+`;
+const SearchInput = styled(motion.input)`
+  width: 240px;
+  padding: 10px 10px;
+  padding-left: 40px;
+  background-color: black;
+  border: 1px solid white;
+  font-size: 15px;
+  transform-origin: center right;
+  position: absolute;
+  right: 0px;
+  color: white;
+  outline: none;
+`;
 const Social = styled.span`
   justify-self: end;
 `;
@@ -58,32 +75,83 @@ const SocialSvg = styled(motion.svg)`
   color: white;
   height: 25px;
 `;
+const navVar = {
+  initial: {
+    boxShadow: "inset 0 20px 25px rgba(0, 0, 0, 1)",
+    backgroundColor: "rgba(0,0,0,0)",
+  },
+  animate: { backgroundColor: "rgba(0,0,0,1)" },
+};
 function Header() {
   const [openSearch, setOpenSearch] = useState(false);
+  const { scrollY } = useViewportScroll();
+  const tvMatch = useMatch("/tv");
+  const homeMatch = useMatch("/");
+  const movieMatch = useMatch("/movie");
+  const myMatch = useMatch("/myContent");
+  const navAnimation = useAnimation();
+
+  useEffect(() => {
+    scrollY.onChange(() => {
+      if (scrollY.get() > 10) {
+        navAnimation.start("animate");
+      } else {
+        navAnimation.start("initial");
+      }
+    });
+  }, [scrollY]);
+
   return (
-    <Nav>
+    <Nav variants={navVar} animate={navAnimation} initial="initial">
       <Link to="/">
         <h1>NEWFLIX</h1>
       </Link>
       <NavItem>
         <Col>
           <Item>
-            <Link to="/">Home</Link>
+            <Link
+              to="/"
+              style={{
+                color: homeMatch ? "white" : "rgba(255, 255, 255, 0.7)",
+              }}
+            >
+              Home
+            </Link>
           </Item>
           <Item>
-            <Link to="/">Movie</Link>
+            <Link
+              to="/movie"
+              style={{
+                color: movieMatch ? "white" : "rgba(255, 255, 255, 0.7)",
+              }}
+            >
+              Movie
+            </Link>
           </Item>
           <Item>
-            <Link to="/">TV</Link>
+            <Link
+              to="/tv"
+              style={{ color: tvMatch ? "white" : "rgba(255, 255, 255, 0.7)" }}
+            >
+              TV
+            </Link>
           </Item>
           <Item>
-            <Link to="/">My contents</Link>
+            <Link
+              to="/myContent"
+              style={{ color: myMatch ? "white" : "rgba(255, 255, 255, 0.7)" }}
+            >
+              My contents
+            </Link>
           </Item>
         </Col>
         <Col2>
           <Search>
-            <motion.svg
+            <SearchSvg
               onClick={() => setOpenSearch((prev) => !prev)}
+              style={{ zIndex: 20, position: "absolute", right: 0 }}
+              animate={{ x: openSearch ? -207 : 0 }}
+              transition={{ type: "tween" }}
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
@@ -93,9 +161,10 @@ function Header() {
                 d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
                 clipRule="evenodd"
               ></motion.path>
-            </motion.svg>
+            </SearchSvg>
             <SearchInput
               placeholder="Search"
+              transition={{ type: "tween" }}
               initial={{ scaleX: openSearch ? 0 : 1 }}
               animate={{ scaleX: openSearch ? 1 : 0 }}
             />

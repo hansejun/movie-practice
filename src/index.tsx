@@ -44,7 +44,7 @@ body {
   color:${(props) => props.theme.white.darker};
   font-family: 'Noto Sans', sans-serif;
   line-height:1.2;
-  background-color:black;
+  background-color:#141414;
 }
 ol, ul {
 	list-style: none;
