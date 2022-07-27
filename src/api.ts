@@ -4,6 +4,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
 export interface IMoive {
   backdrop_path: string;
   title: string;
+  name: string | null;
   overview: string;
   poster_path: string;
   id: number;
@@ -18,6 +19,28 @@ export interface IMovieResult {
   total_results: number;
 }
 
+export interface ITv {
+  backdrop_path: string;
+  name: string;
+  title: string | null;
+  overview: string;
+  poster_path: string;
+  id: number;
+  vote_average: number;
+}
+
+export interface ITvResult {
+  dates: { maximum: number; minimum: number };
+  page: number;
+  results: ITv[];
+  total_pages: number;
+  total_results: number;
+}
+
+interface ITvArr {
+  [key: string]: () => Promise<ITvResult>;
+}
+
 interface IMovieArr {
   [key: string]: () => Promise<IMovieResult>;
 }
@@ -27,6 +50,12 @@ export const movieFnArr: IMovieArr = {
   popular: getPopularMovies,
   topRated: getRatedMovies,
   upcoming: getUpcomingMovies,
+};
+
+export const tvFnArr: ITvArr = {
+  tvShows: getTvshows,
+  popular: getPopularTvshows,
+  topRated: getRatedTvshows,
 };
 
 export function getMovies() {
@@ -49,6 +78,23 @@ export function getRatedMovies() {
 
 export function getUpcomingMovies() {
   return fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}`).then((res) =>
+    res.json()
+  );
+}
+
+export function getTvshows() {
+  return fetch(`${BASE_URL}/tv/on_the_air?api_key=${API_KEY}`).then((res) =>
+    res.json()
+  );
+}
+
+export function getPopularTvshows() {
+  return fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}`).then((res) =>
+    res.json()
+  );
+}
+export function getRatedTvshows() {
+  return fetch(`${BASE_URL}/tv/top_rated?api_key=${API_KEY}`).then((res) =>
     res.json()
   );
 }

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { IMovieResult, movieFnArr } from "../api";
+import { IMovieResult, movieFnArr, tvFnArr, ITvResult } from "../api";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { makeImagePath } from "../util";
@@ -20,9 +20,13 @@ const TitleBox = styled(motion.div)`
   cursor: pointer;
 `;
 const Title = styled(motion.h1)`
-  font-size: 40px;
+  font-size: 35px;
   margin-right: 15px;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  &:hover {
+    color: rgba(255, 255, 255, 1);
+  }
 `;
 const TitleDetail = styled(motion.span)`
   font-weight: 600;
@@ -50,6 +54,7 @@ const RowSlider = styled(motion.ul)`
   grid-template-columns: repeat(6, 1fr);
   gap: 5px;
   position: absolute;
+  cursor: pointer;
 `;
 const RowSliderItem = styled(motion.li)<{ bgImage: string }>`
   height: 160px;
@@ -80,8 +85,10 @@ const RowSliderBtn = styled(motion.span)`
   }
 `;
 interface ISlider {
-  type: string;
   text: string;
+  contentType: string;
+  dataTv?: ITvResult;
+  dataMovie?: IMovieResult;
 }
 const btnVar = {
   initial: { opacity: 0 },
@@ -109,13 +116,12 @@ const detailSvgVar = {
   animate: { x: 0, opacity: 1 },
   exit: { opacity: 0 },
 };
-function Slider({ type, text }: ISlider) {
-  const { data, isLoading } = useQuery<IMovieResult>(
-    ["movies", type],
-    movieFnArr[type]
-  );
+
+function Slider({ text, contentType, dataTv, dataMovie }: ISlider) {
+  const isMovie = contentType == "movies" ? true : false;
   const offset = 6;
   const [index, setIndex] = useState(0);
+  const data = dataTv || dataMovie;
   const pageBtnClick = (bool: boolean) => {
     setNext(bool);
     if (data) {

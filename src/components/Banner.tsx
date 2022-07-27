@@ -1,9 +1,17 @@
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { getMovies, IMovieResult } from "../api";
+import {
+  getMovies,
+  getTvshows,
+  IMovieResult,
+  ITvResult,
+  ITv,
+  IMoive,
+} from "../api";
 import { makeImagePath } from "../util";
 import { useQuery } from "react-query";
+import { useEffect } from "react";
 const FirstContainer = styled.div`
   width: 100%;
   height: 80vh;
@@ -133,33 +141,32 @@ const itemVar = {
   initial: { scale: 1 },
   hover: {
     scaleX: 1.1,
-    backgroundColor: "black",
+    backgroundColor: "rgba(0, 0, 0, 1)",
     transition: { delay: 0.5, duration: 0.3 },
   },
 };
+
 interface IBanner {
   contentType: string;
+  dataTv?: ITvResult;
+  dataMovie?: IMovieResult;
 }
-function Banner({ contentType }: IBanner) {
-  const { data, isLoading } = useQuery<IMovieResult>(
-    ["movies", "nowPlaying"],
-    getMovies,
-    {
-      refetchOnWindowFocus: true,
-    }
-  );
-
+function Banner({ contentType, dataTv, dataMovie }: IBanner) {
+  const isMovie = contentType == "movies" ? true : false;
+  const data = isMovie ? dataMovie : dataTv;
   let offset = 6;
   const [index, setIndex] = useState(0);
   const [isUp, setIsUp] = useState(true);
   const [isHover, setIsHover] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [poster, setPoster] = useState(data?.results[0]);
+
   const toggleUpBtn = (bool: boolean) => {
     setIsUp(bool);
     if (data) {
       if (leaving) return;
       toggleLeaving();
-      const moviesLength = data?.results.length - 1;
+      const moviesLength = data?.results.length;
       const maxIndex = Math.floor(moviesLength / offset);
       if (isUp) {
         setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
@@ -194,7 +201,7 @@ function Banner({ contentType }: IBanner) {
               {data?.results
                 .slice(offset * index, offset * index + offset)
                 .map((movie) => (
-                  <SideItem key={movie.id}>
+                  <SideItem key={movie.id} onClick={() => setPoster(movie)}>
                     <SideItemPoster
                       bgImage={makeImagePath(movie.backdrop_path + "")}
                     />
@@ -204,7 +211,7 @@ function Banner({ contentType }: IBanner) {
                       whileHover="hover"
                       transition={{ type: "tween" }}
                     >
-                      <h2>{movie.title}</h2>
+                      <h2>{isMovie ? movie?.title : movie?.name}</h2>
                       <p>
                         Average: <span>{movie.vote_average}</span>
                       </p>
@@ -255,10 +262,28 @@ function Banner({ contentType }: IBanner) {
           ) : null}
         </AnimatePresence>
       </SideBox>
-      <Poster bgImage={makeImagePath(data?.results[0].backdrop_path + "")}>
-        <PosterTitle>{data?.results[0].title}</PosterTitle>
-        <PosterOverview>{data?.results[0].overview}</PosterOverview>
-      </Poster>
+      <AnimatePresence initial={false}>
+        <Poster
+          bgImage={makeImagePath(
+            poster
+              ? poster?.backdrop_path + ""
+              : data?.results[0].backdrop_path + ""
+          )}
+        >
+          <PosterTitle>
+            {isMovie
+              ? poster
+                ? poster?.title
+                : data?.results[0].title
+              : poster
+              ? poster?.name
+              : data?.results[0].name}
+          </PosterTitle>
+          <PosterOverview>
+            {poster ? poster?.overview : data?.results[0].overview}
+          </PosterOverview>
+        </Poster>
+      </AnimatePresence>
     </FirstContainer>
   );
 }
