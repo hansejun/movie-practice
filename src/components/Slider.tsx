@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
-import { useQuery } from "react-query";
+
 import styled from "styled-components";
-import { IMovieResult, movieFnArr, tvFnArr, ITvResult } from "../api";
+import { IMovieResult, ITvResult } from "../api";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { makeImagePath } from "../util";
+import Card from "./Card";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { idAtom, isClickAtom, itemAtom } from "../atom";
 const SliderWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -61,6 +64,12 @@ const RowSliderItem = styled(motion.li)<{ bgImage: string }>`
   background-image: url(${(props) => props.bgImage});
   background-position: center center;
   background-size: cover;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
 const RowSliderBtn = styled(motion.span)`
   position: absolute;
@@ -134,119 +143,131 @@ function Slider({ text, contentType, dataTv, dataMovie }: ISlider) {
       }
     }
   };
+
   const [isHover, setIsHover] = useState(false);
-  const [isBtnHover, setIsBtnHover] = useState(false);
   const [isTitleHover, setIsTitleHover] = useState(false);
   const [next, setNext] = useState(true);
 
+  const [id, setId] = useRecoilState(idAtom);
+  const [itemData, setItemData] = useRecoilState(itemAtom);
+  const setIsClick = useSetRecoilState(isClickAtom);
   return (
-    <SliderWrapper>
-      <TitleBox>
-        <Title
-          onHoverStart={() => setIsTitleHover(true)}
-          onHoverEnd={() => setIsTitleHover(false)}
-        >
-          {text}
-        </Title>
-        <AnimatePresence>
-          {isTitleHover ? (
-            <TitleDetail>
-              <motion.span
-                variants={detailTextVar}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 0.5 }}
-              >
-                Detail
-              </motion.span>
-              <motion.svg
-                variants={detailSvgVar}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 256 512"
-              >
-                <motion.path
-                  strokeWidth="60"
-                  stroke="red"
-                  d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z"
-                />
-              </motion.svg>
-            </TitleDetail>
-          ) : null}
-        </AnimatePresence>
-      </TitleBox>
-      <Row
-        onHoverStart={() => setIsHover(true)}
-        onHoverEnd={() => setIsHover(false)}
-      >
-        <AnimatePresence initial={false} custom={next}>
-          <RowSlider
-            key={index}
-            variants={sliderVar}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            custom={next}
-            transition={{ type: "tween", duration: 1 }}
+    <>
+      <SliderWrapper>
+        <TitleBox>
+          <Title
+            onHoverStart={() => setIsTitleHover(true)}
+            onHoverEnd={() => setIsTitleHover(false)}
           >
-            {data?.results
-              .slice(offset * index, offset * index + offset)
-              .map((movie) => (
-                <RowSliderItem
-                  key={movie.id}
-                  bgImage={makeImagePath(movie.backdrop_path + "")}
-                />
-              ))}
-          </RowSlider>
-        </AnimatePresence>
-        <AnimatePresence>
-          {isHover ? (
-            <>
-              <RowSliderBtn
-                key={"323"}
-                style={{ left: 0 }}
-                variants={btnVar}
-                initial="initial"
-                animate="animate"
-                exit="end"
-                whileHover="hover"
-                onClick={() => pageBtnClick(false)}
-              >
+            {text}
+          </Title>
+          <AnimatePresence>
+            {isTitleHover ? (
+              <TitleDetail>
+                <motion.span
+                  variants={detailTextVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.5 }}
+                >
+                  Detail
+                </motion.span>
                 <motion.svg
+                  variants={detailSvgVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
                   fill="currentColor"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 256 512"
                 >
-                  <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
+                  <motion.path
+                    strokeWidth="60"
+                    stroke="red"
+                    d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z"
+                  />
                 </motion.svg>
-              </RowSliderBtn>
-              <RowSliderBtn
-                key={"324"}
-                style={{ right: 0 }}
-                onClick={() => pageBtnClick(true)}
-                variants={btnVar}
-                initial="initial"
-                animate="animate"
-                exit="end"
-                whileHover="hover"
-              >
-                <motion.svg
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 512"
+              </TitleDetail>
+            ) : null}
+          </AnimatePresence>
+        </TitleBox>
+        <Row
+          onHoverStart={() => setIsHover(true)}
+          onHoverEnd={() => setIsHover(false)}
+        >
+          <AnimatePresence initial={false} custom={next}>
+            <RowSlider
+              key={index}
+              variants={sliderVar}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              custom={next}
+              transition={{ type: "tween", duration: 1 }}
+            >
+              {data?.results
+                .slice(offset * index, offset * index + offset)
+                .map((movie) => (
+                  <RowSliderItem
+                    key={movie.id}
+                    layoutId={text + movie.id}
+                    bgImage={makeImagePath(movie.backdrop_path + "")}
+                    whileHover={{ scale: 1.2, transition: { delay: 0.4 } }}
+                    onClick={() => {
+                      setId(text + movie.id);
+                      setItemData(movie);
+                      setIsClick(true);
+                    }}
+                  />
+                ))}
+            </RowSlider>
+          </AnimatePresence>
+          <AnimatePresence>
+            {isHover ? (
+              <>
+                <RowSliderBtn
+                  key={"323"}
+                  style={{ left: 0 }}
+                  variants={btnVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="end"
+                  whileHover="hover"
+                  onClick={() => pageBtnClick(false)}
                 >
-                  <path d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z" />
-                </motion.svg>
-              </RowSliderBtn>
-            </>
-          ) : null}
-        </AnimatePresence>
-      </Row>
-    </SliderWrapper>
+                  <motion.svg
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 256 512"
+                  >
+                    <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
+                  </motion.svg>
+                </RowSliderBtn>
+                <RowSliderBtn
+                  key={"324"}
+                  style={{ right: 0 }}
+                  onClick={() => pageBtnClick(true)}
+                  variants={btnVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="end"
+                  whileHover="hover"
+                >
+                  <motion.svg
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 256 512"
+                  >
+                    <path d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z" />
+                  </motion.svg>
+                </RowSliderBtn>
+              </>
+            ) : null}
+          </AnimatePresence>
+        </Row>
+      </SliderWrapper>
+    </>
   );
 }
 export default Slider;

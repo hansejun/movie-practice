@@ -150,8 +150,9 @@ interface IBanner {
   contentType: string;
   dataTv?: ITvResult;
   dataMovie?: IMovieResult;
+  isLoading?: boolean;
 }
-function Banner({ contentType, dataTv, dataMovie }: IBanner) {
+function Banner({ contentType, dataTv, dataMovie, isLoading }: IBanner) {
   const isMovie = contentType == "movies" ? true : false;
   const data = isMovie ? dataMovie : dataTv;
   let offset = 6;

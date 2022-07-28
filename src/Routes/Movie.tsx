@@ -16,7 +16,7 @@ const Wrapper = styled.div`
 function Movie() {
   const contentType = "movies";
 
-  const { data: allMovieShow, isLoading: allTvIsLoading } =
+  const { data: allMovieShow, isLoading: allMovieIsLoading } =
     useQuery<IMovieResult>([contentType, "now playing"], movieFnArr.movies);
 
   const { data: popularMovie, isLoading: popularMovieIsLoading } =

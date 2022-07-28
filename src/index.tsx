@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RecoilRoot } from "recoil";
-import { QueryClient, QueryClientProvider } from "react-query";
+
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { myTheme } from "./theme";
 import App from "./App";
@@ -9,7 +9,7 @@ import App from "./App";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-const client = new QueryClient();
+
 const GlobalStyle = createGlobalStyle`
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
@@ -45,6 +45,7 @@ body {
   font-family: 'Noto Sans', sans-serif;
   line-height:1.2;
   background-color:#141414;
+  position:relative;
 }
 ol, ul {
 	list-style: none;
@@ -72,12 +73,10 @@ a{
 root.render(
   <React.StrictMode>
     <RecoilRoot>
-      <QueryClientProvider client={client}>
-        <ThemeProvider theme={myTheme}>
-          <App />
-          <GlobalStyle />
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ThemeProvider theme={myTheme}>
+        <App />
+        <GlobalStyle />
+      </ThemeProvider>
     </RecoilRoot>
   </React.StrictMode>
 );

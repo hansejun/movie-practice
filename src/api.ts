@@ -56,6 +56,7 @@ export const tvFnArr: ITvArr = {
   tvShows: getTvshows,
   popular: getPopularTvshows,
   topRated: getRatedTvshows,
+  today: getTodayTvshows,
 };
 
 export function getMovies() {
@@ -98,3 +99,16 @@ export function getRatedTvshows() {
     res.json()
   );
 }
+export function getTodayTvshows() {
+  return fetch(`${BASE_URL}/tv/airing_today?api_key=${API_KEY}`).then((res) =>
+    res.json()
+  );
+}
+
+export function getTvVideo(tvId: number) {
+  return fetch(
+    `${BASE_URL}/tv/${tvId}/videos?api_key=${API_KEY}&language=ko-KR`
+  ).then((res) => res.json());
+}
+// data.results[0].key값을 가졍와 watch?v= ${key}를 해주면 경로로 가긴한다.
+//https://www.youtube.com/watch?v=_MhaSxMZfDM
