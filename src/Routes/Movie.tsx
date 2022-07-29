@@ -3,6 +3,7 @@ import Slider from "../components/Slider";
 import Banner from "../components/Banner";
 import { useQuery } from "react-query";
 import { IMovieResult, movieFnArr } from "../api";
+import Card from "../components/Card";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -29,20 +30,27 @@ function Movie() {
     useQuery<IMovieResult>([contentType, "upcoming"], movieFnArr.upcoming);
 
   return (
-    <Wrapper>
-      <Banner contentType="movies" dataMovie={allMovieShow} />
-      <Slider
-        contentType="movies"
-        text={"What's Popular"}
-        dataMovie={popularMovie}
-      />
-      <Slider contentType="movies" text={"Top Rated"} dataMovie={ratedTMovie} />
-      <Slider
-        contentType="movies"
-        text={"Upcoming Movies"}
-        dataMovie={upcomingMovie}
-      />
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Banner contentType="movies" dataMovie={allMovieShow} />
+        <Slider
+          contentType="movies"
+          text={"What's Popular"}
+          dataMovie={popularMovie}
+        />
+        <Slider
+          contentType="movies"
+          text={"Top Rated"}
+          dataMovie={ratedTMovie}
+        />
+        <Slider
+          contentType="movies"
+          text={"Upcoming Movies"}
+          dataMovie={upcomingMovie}
+        />
+      </Wrapper>
+      <Card />
+    </>
   );
 }
 export default Movie;

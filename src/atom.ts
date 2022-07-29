@@ -26,3 +26,8 @@ export const itemAtom = atom<ITv | IMoive>({
     vote_average: 0,
   },
 });
+
+export const dataTypeAtom = atom({
+  key: "dataType",
+  default: "movies",
+});

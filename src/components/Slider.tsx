@@ -7,8 +7,8 @@ import { useState } from "react";
 import { makeImagePath } from "../util";
 import Card from "./Card";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { idAtom, isClickAtom, itemAtom } from "../atom";
-const SliderWrapper = styled.div`
+import { dataTypeAtom, idAtom, isClickAtom, itemAtom } from "../atom";
+const SliderWrapper = styled(motion.div)`
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -93,12 +93,52 @@ const RowSliderBtn = styled(motion.span)`
     }
   }
 `;
+
+const ChangeBtns = styled.div`
+  width: 200px;
+  height: 40px;
+  border: 1px solid black;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
+const ChangeBtn = styled(motion.span)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  position: relative;
+  font-size: 16px;
+  font-weight: 600;
+`;
+const ChangeBtnFill = styled(motion.span)`
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 50, 149, 1),
+    rgba(211, 0, 0, 1)
+  );
+  position: absolute;
+  z-index: -1;
+`;
+
 interface ISlider {
   text: string;
   contentType: string;
   dataTv?: ITvResult;
   dataMovie?: IMovieResult;
+  isHome?: boolean;
 }
+
+const componentVar = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 const btnVar = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -126,7 +166,7 @@ const detailSvgVar = {
   exit: { opacity: 0 },
 };
 
-function Slider({ text, contentType, dataTv, dataMovie }: ISlider) {
+function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
   const isMovie = contentType == "movies" ? true : false;
   const offset = 6;
   const [index, setIndex] = useState(0);
@@ -151,122 +191,148 @@ function Slider({ text, contentType, dataTv, dataMovie }: ISlider) {
   const [id, setId] = useRecoilState(idAtom);
   const [itemData, setItemData] = useRecoilState(itemAtom);
   const setIsClick = useSetRecoilState(isClickAtom);
+  const [dataType, setDataType] = useRecoilState(dataTypeAtom);
   return (
     <>
-      <SliderWrapper>
-        <TitleBox>
-          <Title
-            onHoverStart={() => setIsTitleHover(true)}
-            onHoverEnd={() => setIsTitleHover(false)}
-          >
-            {text}
-          </Title>
-          <AnimatePresence>
-            {isTitleHover ? (
-              <TitleDetail>
-                <motion.span
-                  variants={detailTextVar}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.5 }}
-                >
-                  Detail
-                </motion.span>
-                <motion.svg
-                  variants={detailSvgVar}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 512"
-                >
-                  <motion.path
-                    strokeWidth="60"
-                    stroke="red"
-                    d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z"
-                  />
-                </motion.svg>
-              </TitleDetail>
-            ) : null}
-          </AnimatePresence>
-        </TitleBox>
-        <Row
-          onHoverStart={() => setIsHover(true)}
-          onHoverEnd={() => setIsHover(false)}
+      <AnimatePresence>
+        <SliderWrapper
+          variants={componentVar}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 1 }}
         >
-          <AnimatePresence initial={false} custom={next}>
-            <RowSlider
-              key={index}
-              variants={sliderVar}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              custom={next}
-              transition={{ type: "tween", duration: 1 }}
+          <TitleBox>
+            <Title
+              onHoverStart={() => setIsTitleHover(true)}
+              onHoverEnd={() => setIsTitleHover(false)}
             >
-              {data?.results
-                .slice(offset * index, offset * index + offset)
-                .map((movie) => (
-                  <RowSliderItem
-                    key={movie.id}
-                    layoutId={text + movie.id}
-                    bgImage={makeImagePath(movie.backdrop_path + "")}
-                    whileHover={{ scale: 1.2, transition: { delay: 0.4 } }}
-                    onClick={() => {
-                      setId(text + movie.id);
-                      setItemData(movie);
-                      setIsClick(true);
-                    }}
-                  />
-                ))}
-            </RowSlider>
-          </AnimatePresence>
-          <AnimatePresence>
-            {isHover ? (
-              <>
-                <RowSliderBtn
-                  key={"323"}
-                  style={{ left: 0 }}
-                  variants={btnVar}
-                  initial="initial"
-                  animate="animate"
-                  exit="end"
-                  whileHover="hover"
-                  onClick={() => pageBtnClick(false)}
-                >
-                  <motion.svg
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 256 512"
+              {text}
+            </Title>
+            {isHome ? (
+              <ChangeBtns>
+                <ChangeBtn onClick={() => setDataType("movies")}>
+                  Movie
+                  {dataType == "movies" ? (
+                    <ChangeBtnFill layoutId="changeMode" />
+                  ) : null}
+                </ChangeBtn>
+                <ChangeBtn onClick={() => setDataType("tvShows")}>
+                  Tv
+                  {dataType == "tvShows" ? (
+                    <ChangeBtnFill layoutId="changeMode" />
+                  ) : null}
+                </ChangeBtn>
+              </ChangeBtns>
+            ) : (
+              <AnimatePresence>
+                {isTitleHover ? (
+                  <TitleDetail>
+                    <motion.span
+                      variants={detailTextVar}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.5 }}
+                    >
+                      Detail
+                    </motion.span>
+                    <motion.svg
+                      variants={detailSvgVar}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 256 512"
+                    >
+                      <motion.path
+                        strokeWidth="60"
+                        stroke="red"
+                        d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z"
+                      />
+                    </motion.svg>
+                  </TitleDetail>
+                ) : null}
+              </AnimatePresence>
+            )}
+          </TitleBox>
+          <Row
+            onHoverStart={() => setIsHover(true)}
+            onHoverEnd={() => setIsHover(false)}
+          >
+            <AnimatePresence initial={false} custom={next}>
+              <RowSlider
+                key={index}
+                variants={sliderVar}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                custom={next}
+                transition={{ type: "tween", duration: 1 }}
+              >
+                {data?.results
+                  .slice(offset * index, offset * index + offset)
+                  .map((movie) => (
+                    <RowSliderItem
+                      key={movie.id}
+                      layoutId={text + movie.id}
+                      bgImage={makeImagePath(movie.backdrop_path + "")}
+                      whileHover={{ scale: 1.2, transition: { delay: 0.4 } }}
+                      onClick={() => {
+                        setId(text + movie.id);
+                        setItemData(movie);
+                        setIsClick(true);
+                      }}
+                    />
+                  ))}
+              </RowSlider>
+            </AnimatePresence>
+            <AnimatePresence>
+              {isHover ? (
+                <>
+                  <RowSliderBtn
+                    key={"323"}
+                    style={{ left: 0 }}
+                    variants={btnVar}
+                    initial="initial"
+                    animate="animate"
+                    exit="end"
+                    whileHover="hover"
+                    onClick={() => pageBtnClick(false)}
                   >
-                    <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
-                  </motion.svg>
-                </RowSliderBtn>
-                <RowSliderBtn
-                  key={"324"}
-                  style={{ right: 0 }}
-                  onClick={() => pageBtnClick(true)}
-                  variants={btnVar}
-                  initial="initial"
-                  animate="animate"
-                  exit="end"
-                  whileHover="hover"
-                >
-                  <motion.svg
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 256 512"
+                    <motion.svg
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 256 512"
+                    >
+                      <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
+                    </motion.svg>
+                  </RowSliderBtn>
+                  <RowSliderBtn
+                    key={"324"}
+                    style={{ right: 0 }}
+                    onClick={() => pageBtnClick(true)}
+                    variants={btnVar}
+                    initial="initial"
+                    animate="animate"
+                    exit="end"
+                    whileHover="hover"
                   >
-                    <path d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z" />
-                  </motion.svg>
-                </RowSliderBtn>
-              </>
-            ) : null}
-          </AnimatePresence>
-        </Row>
-      </SliderWrapper>
+                    <motion.svg
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 256 512"
+                    >
+                      <path d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z" />
+                    </motion.svg>
+                  </RowSliderBtn>
+                </>
+              ) : null}
+            </AnimatePresence>
+          </Row>
+        </SliderWrapper>
+      </AnimatePresence>
     </>
   );
 }
