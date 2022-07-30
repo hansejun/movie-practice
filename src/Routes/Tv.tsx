@@ -19,30 +19,39 @@ export const bannerVar = {
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 };
-
+// contentType이랑
 function Tv() {
   const contentType = "tvShows";
 
-  const { data: allTvShow, isLoading: allTvIsLoading } = useQuery<ITvResult>(
+  const { data: allTvShow } = useQuery<ITvResult>(
     [contentType, "now playing"],
     tvFnArr.tvShows,
     { refetchOnWindowFocus: true }
   );
 
-  const { data: popularTvshow, isLoading: popularTvIsLoading } =
-    useQuery<ITvResult>([contentType, "popular"], tvFnArr.popular, {
+  const { data: popularTvshow } = useQuery<ITvResult>(
+    [contentType, "popular"],
+    tvFnArr.popular,
+    {
       refetchOnWindowFocus: true,
-    });
+    }
+  );
 
-  const { data: ratedTvshow, isLoading: ratedTvIsLoading } =
-    useQuery<ITvResult>([contentType, "topRated"], tvFnArr.topRated, {
+  const { data: ratedTvshow } = useQuery<ITvResult>(
+    [contentType, "topRated"],
+    tvFnArr.topRated,
+    {
       refetchOnWindowFocus: true,
-    });
+    }
+  );
 
-  const { data: todayTvshow, isLoading: todayTvIsLoading } =
-    useQuery<ITvResult>([contentType, "today"], tvFnArr.today, {
+  const { data: todayTvshow } = useQuery<ITvResult>(
+    [contentType, "today"],
+    tvFnArr.today,
+    {
       refetchOnWindowFocus: true,
-    });
+    }
+  );
 
   return (
     <>

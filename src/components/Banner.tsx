@@ -1,17 +1,9 @@
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import {
-  getMovies,
-  getTvshows,
-  IMovieResult,
-  ITvResult,
-  ITv,
-  IMoive,
-} from "../api";
+import { IMovieResult, ITvResult } from "../api";
 import { makeImagePath } from "../util";
-import { useQuery } from "react-query";
-import { useEffect } from "react";
+
 const FirstContainer = styled.div`
   width: 100%;
   height: 80vh;
@@ -33,7 +25,11 @@ const NowPlayBox = styled.div`
   font-size: 16px;
   font-weight: 500;
   z-index: 50;
-  background-color: black;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 50, 149, 1),
+    rgba(211, 0, 0, 1)
+  );
   display: flex;
   justify-content: center;
   align-items: center;

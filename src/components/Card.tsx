@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { idAtom, isClickAtom, itemAtom } from "../atom";
+import { idAtom, isClickAtom, itemAtom, myContentAtom } from "../atom";
 import { makeImagePath } from "../util";
 
 const Overlay = styled(motion.div)`
@@ -45,20 +45,22 @@ const BoxText = styled.div`
     font-size: 30px;
     margin-bottom: 10px;
     font-weight: 600;
+    color: white;
   }
   p {
     width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* 라인수 */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     word-wrap: break-word;
     line-height: 1.2em;
     height: 3.6em;
+    color: rgba(255, 255, 255, 0.6);
   }
 `;
-const BoxTextBtn = styled.button`
+const BoxTextBtn = styled(motion.button)`
   width: 100px;
   height: 40px;
   border-radius: 8px;
@@ -77,6 +79,7 @@ const BoxTextBtn = styled.button`
     );
   }
   margin-bottom: 20px;
+  cursor: pointer;
 `;
 
 const ExitBtn = styled.span`
@@ -105,6 +108,18 @@ function Card() {
   const id = useRecoilValue(idAtom);
   const data = useRecoilValue(itemAtom);
   const [isClick, setIsClick] = useRecoilState(isClickAtom);
+  const [myContents, setMycontents] = useRecoilState(myContentAtom);
+
+  const addContentClick = () => {
+    setIsClick(false);
+    setMycontents((allContents) => {
+      const ok = allContents.filter((content) => content.id == data.id);
+      if (ok.length >= 1) {
+        return [...allContents];
+      }
+      return [...allContents, data];
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -122,7 +137,12 @@ function Card() {
             <BoxText>
               <h1>{data.title || data.name}</h1>
               <div>
-                <BoxTextBtn>Play</BoxTextBtn>
+                <BoxTextBtn
+                  onClick={addContentClick}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  Add
+                </BoxTextBtn>
                 <BoxTextBtn>Detail</BoxTextBtn>
               </div>
               <p>{data.overview}</p>

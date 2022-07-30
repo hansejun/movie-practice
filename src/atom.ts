@@ -1,10 +1,10 @@
 import { atom } from "recoil";
 import { IMoive, ITv } from "./api";
-interface IItem {
-  backdrop_path: string;
-  name?: string;
-  title?: string;
+
+interface IDataType {
+  [key: string]: string;
 }
+
 export const isClickAtom = atom({
   key: "isClick",
   default: false,
@@ -27,7 +27,15 @@ export const itemAtom = atom<ITv | IMoive>({
   },
 });
 
-export const dataTypeAtom = atom({
+export const dataTypeAtom = atom<IDataType>({
   key: "dataType",
-  default: "movies",
+  default: {
+    ["popular"]: "movies",
+    ["rated"]: "movies",
+  },
+});
+
+export const myContentAtom = atom<ITv[]>({
+  key: "myContents",
+  default: [],
 });

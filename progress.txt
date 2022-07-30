@@ -1,7 +1,7 @@
-
-클릭했을 때 영화에 대한 정보 나오게  하기 
-포스터 클릭 활성화 
-slider hover시에 scale 크기 업 
+search page 만들기 
+ 
+ useForm ? 
+ {register ,handleSubmit,setValue} 사용 
 
 
 

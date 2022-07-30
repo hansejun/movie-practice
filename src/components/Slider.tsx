@@ -5,7 +5,6 @@ import { IMovieResult, ITvResult } from "../api";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { makeImagePath } from "../util";
-import Card from "./Card";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { dataTypeAtom, idAtom, isClickAtom, itemAtom } from "../atom";
 const SliderWrapper = styled(motion.div)`
@@ -19,7 +18,7 @@ const SliderWrapper = styled(motion.div)`
 const TitleBox = styled(motion.div)`
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   cursor: pointer;
 `;
 const Title = styled(motion.h1)`
@@ -70,6 +69,9 @@ const RowSliderItem = styled(motion.li)<{ bgImage: string }>`
   &:last-child {
     transform-origin: center right;
   }
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 const RowSliderBtn = styled(motion.span)`
   position: absolute;
@@ -132,12 +134,13 @@ interface ISlider {
   dataTv?: ITvResult;
   dataMovie?: IMovieResult;
   isHome?: boolean;
+  contentKey?: string;
 }
 
-const componentVar = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
+const rowVar = {
+  initial: { opacity: 0, filter: "blur(5px)" },
+  animate: { opacity: 1, filter: "blur(0px)" },
+  exit: { opacity: 0, filter: "blur(5px)" },
 };
 const btnVar = {
   initial: { opacity: 0 },
@@ -166,7 +169,14 @@ const detailSvgVar = {
   exit: { opacity: 0 },
 };
 
-function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
+function Slider({
+  text,
+  contentType,
+  dataTv,
+  dataMovie,
+  isHome,
+  contentKey,
+}: ISlider) {
   const isMovie = contentType == "movies" ? true : false;
   const offset = 6;
   const [index, setIndex] = useState(0);
@@ -188,20 +198,14 @@ function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
   const [isTitleHover, setIsTitleHover] = useState(false);
   const [next, setNext] = useState(true);
 
-  const [id, setId] = useRecoilState(idAtom);
-  const [itemData, setItemData] = useRecoilState(itemAtom);
+  const setId = useSetRecoilState(idAtom);
+  const setItemData = useSetRecoilState(itemAtom);
   const setIsClick = useSetRecoilState(isClickAtom);
   const [dataType, setDataType] = useRecoilState(dataTypeAtom);
   return (
     <>
       <AnimatePresence>
-        <SliderWrapper
-          variants={componentVar}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={{ duration: 1 }}
-        >
+        <SliderWrapper>
           <TitleBox>
             <Title
               onHoverStart={() => setIsTitleHover(true)}
@@ -211,16 +215,28 @@ function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
             </Title>
             {isHome ? (
               <ChangeBtns>
-                <ChangeBtn onClick={() => setDataType("movies")}>
+                <ChangeBtn
+                  onClick={() =>
+                    setDataType((prev) => {
+                      return { ...dataType, [contentKey as string]: "movies" };
+                    })
+                  }
+                >
                   Movie
-                  {dataType == "movies" ? (
-                    <ChangeBtnFill layoutId="changeMode" />
+                  {dataType[contentKey as string] == "movies" ? (
+                    <ChangeBtnFill layoutId={text + "changeMode"} />
                   ) : null}
                 </ChangeBtn>
-                <ChangeBtn onClick={() => setDataType("tvShows")}>
+                <ChangeBtn
+                  onClick={() =>
+                    setDataType((prev) => {
+                      return { ...dataType, [contentKey as string]: "tvShows" };
+                    })
+                  }
+                >
                   Tv
-                  {dataType == "tvShows" ? (
-                    <ChangeBtnFill layoutId="changeMode" />
+                  {dataType[contentKey as string] == "tvShows" ? (
+                    <ChangeBtnFill layoutId={text + "changeMode"} />
                   ) : null}
                 </ChangeBtn>
               </ChangeBtns>
@@ -258,6 +274,12 @@ function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
             )}
           </TitleBox>
           <Row
+            variants={rowVar}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 1 }}
+            key={dataType[contentKey as string]}
             onHoverStart={() => setIsHover(true)}
             onHoverEnd={() => setIsHover(false)}
           >
@@ -284,7 +306,11 @@ function Slider({ text, contentType, dataTv, dataMovie, isHome }: ISlider) {
                         setItemData(movie);
                         setIsClick(true);
                       }}
-                    />
+                    >
+                      {movie.backdrop_path == null ? (
+                        <p>{movie.title || movie.name}</p>
+                      ) : null}
+                    </RowSliderItem>
                   ))}
               </RowSlider>
             </AnimatePresence>

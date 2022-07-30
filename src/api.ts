@@ -8,7 +8,7 @@ export interface IMoive {
   overview: string;
   poster_path: string;
   id: number;
-  vote_average: number;
+  vote_average?: number;
 }
 
 export interface IMovieResult {
@@ -21,12 +21,12 @@ export interface IMovieResult {
 
 export interface ITv {
   backdrop_path: string;
-  name: string;
+  name: string | null;
   title: string | null;
   overview: string;
   poster_path: string;
   id: number;
-  vote_average: number;
+  vote_average?: number;
 }
 
 export interface ITvResult {
@@ -43,6 +43,40 @@ interface ITvArr {
 
 interface IMovieArr {
   [key: string]: () => Promise<IMovieResult>;
+}
+
+export interface ITrending {
+  poster_path: string;
+  name: string | null;
+  title: string | null;
+  release_date: string | null;
+  first_air_date: string | null;
+  id: number;
+  backdrop_path: string;
+}
+
+export interface ITrendingResult {
+  page: number;
+  results: ITrending[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ISearch {
+  poster_path: string | null;
+  overview: string;
+  id: number;
+  media_type: string;
+  title?: string;
+  name?: string;
+  backdrop_path: string | null;
+}
+
+export interface ISearchResult {
+  page: number;
+  results: ISearch[];
+  total_pages: number;
+  total_results: number;
 }
 
 export const movieFnArr: IMovieArr = {
@@ -110,5 +144,24 @@ export function getTvVideo(tvId: number) {
     `${BASE_URL}/tv/${tvId}/videos?api_key=${API_KEY}&language=ko-KR`
   ).then((res) => res.json());
 }
+
+export function getTrending(period: string) {
+  return fetch(`${BASE_URL}/trending/all/${period}?api_key=${API_KEY}`).then(
+    (res) => res.json()
+  );
+}
+
+export function getSearchMovies(keyword: string) {
+  return fetch(
+    `${BASE_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
+  ).then((res) => res.json());
+}
+
+export function getSearchTvShows(keyword: string) {
+  return fetch(
+    `${BASE_URL}/search/tv?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
+  ).then((res) => res.json());
+}
+
 // data.results[0].key값을 가졍와 watch?v= ${key}를 해주면 경로로 가긴한다.
 //https://www.youtube.com/watch?v=_MhaSxMZfDM

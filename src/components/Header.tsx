@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 const Nav = styled(motion.nav)`
   height: 70px;
   display: grid;
@@ -82,6 +83,11 @@ const navVar = {
   },
   animate: { backgroundColor: "rgba(0,0,0,1)" },
 };
+
+export interface IForm {
+  keyword: string;
+}
+
 function Header() {
   const [openSearch, setOpenSearch] = useState(false);
   const { scrollY } = useViewportScroll();
@@ -90,7 +96,13 @@ function Header() {
   const movieMatch = useMatch("/movie");
   const myMatch = useMatch("/myContent");
   const navAnimation = useAnimation();
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const navigate = useNavigate();
 
+  const onValid = (data: IForm) => {
+    navigate(`/search?keyword=${data.keyword}`);
+    setValue("keyword", "");
+  };
   useEffect(() => {
     scrollY.onChange(() => {
       if (scrollY.get() > 10) {
@@ -138,7 +150,7 @@ function Header() {
           </Item>
           <Item>
             <Link
-              to="/myContent"
+              to="/myContents"
               style={{ color: myMatch ? "white" : "rgba(255, 255, 255, 0.7)" }}
             >
               My contents
@@ -146,7 +158,7 @@ function Header() {
           </Item>
         </Col>
         <Col2>
-          <Search>
+          <Search onSubmit={handleSubmit(onValid)}>
             <SearchSvg
               onClick={() => setOpenSearch((prev) => !prev)}
               style={{ zIndex: 20, position: "absolute", right: 0 }}
@@ -163,6 +175,7 @@ function Header() {
               ></motion.path>
             </SearchSvg>
             <SearchInput
+              {...register("keyword", { required: true, minLength: 2 })}
               placeholder="Search"
               transition={{ type: "tween" }}
               initial={{ scaleX: openSearch ? 0 : 1 }}

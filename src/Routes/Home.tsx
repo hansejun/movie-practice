@@ -1,13 +1,16 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { IMovieResult, ITvResult, movieFnArr, tvFnArr } from "../api";
 import { makeImagePath } from "../util";
 import Slider from "../components/Slider";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { dataTypeAtom } from "../atom";
 import Card from "../components/Card";
+import Trending from "../components/Trending";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { IForm } from "../components/Header";
+
 const Wrapper = styled.div`
   width: 100%;
   height: 200vh;
@@ -72,14 +75,40 @@ const SearchBtn = styled.button`
 `;
 function Home() {
   const contentType = ["movies", "tvShows"];
-  const [dataType, setDataType] = useRecoilState(dataTypeAtom);
-  const { data: popularMovie, isLoading: popularMovieIsLoading } =
-    useQuery<IMovieResult>([contentType[0], "popular"], movieFnArr.popular);
+  const dataType = useRecoilValue(dataTypeAtom);
 
-  const { data: popularTvshow, isLoading: popularTvIsLoading } =
-    useQuery<ITvResult>([contentType[1], "popular"], tvFnArr.popular, {
+  const { data: popularMovie } = useQuery<IMovieResult>(
+    [contentType[0], "popular"],
+    movieFnArr.popular
+  );
+
+  const { data: popularTvshow } = useQuery<ITvResult>(
+    [contentType[1], "popular"],
+    tvFnArr.popular,
+    {
       refetchOnWindowFocus: true,
-    });
+    }
+  );
+
+  const { data: ratedTvshow } = useQuery<ITvResult>(
+    [contentType[1], "topRated"],
+    tvFnArr.topRated,
+    {
+      refetchOnWindowFocus: true,
+    }
+  );
+  const { data: ratedMovie } = useQuery<IMovieResult>(
+    [contentType[0], "topRated"],
+    movieFnArr.topRated
+  );
+
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const navigate = useNavigate();
+
+  const onValid = (data: IForm) => {
+    navigate(`/search?keyword=${data.keyword}`);
+    setValue("keyword", "");
+  };
 
   return (
     <>
@@ -91,26 +120,53 @@ function Home() {
           <h2>
             Millions of movies, TV shows and people to discover. Explore now.
           </h2>
-          <Form>
-            <Search placeholder="Search for a movie, tv show, person..." />
+          <Form onSubmit={handleSubmit(onValid)}>
+            <Search
+              {...register("keyword", { required: true, minLength: 2 })}
+              placeholder="Search for a movie, tv show, person..."
+            />
             <SearchBtn>Search</SearchBtn>
           </Form>
         </HomeBanner>
-        {dataType == "movies" ? (
-          <Slider
-            text="What's Popular?"
-            contentType={"movies"}
-            dataMovie={popularMovie}
-            isHome={true}
-          />
-        ) : (
-          <Slider
-            text="What's Popular?"
-            contentType={"tvShows"}
-            dataTv={popularTvshow}
-            isHome={true}
-          />
-        )}
+        <>
+          {dataType.popular == "movies" ? (
+            <Slider
+              text="What's Popular?"
+              contentType={"movies"}
+              dataMovie={popularMovie}
+              isHome={true}
+              contentKey={"popular"}
+            />
+          ) : (
+            <Slider
+              text="What's Popular?"
+              contentType={"tvShows"}
+              dataTv={popularTvshow}
+              isHome={true}
+              contentKey={"popular"}
+            />
+          )}
+        </>
+        <>
+          {dataType.rated == "movies" ? (
+            <Slider
+              text="Top Rated"
+              contentType={"movies"}
+              dataMovie={ratedMovie}
+              isHome={true}
+              contentKey={"rated"}
+            />
+          ) : (
+            <Slider
+              text="Top Rated"
+              contentType={"tvShows"}
+              dataTv={ratedTvshow}
+              isHome={true}
+              contentKey={"rated"}
+            />
+          )}
+        </>
+        <Trending />
       </Wrapper>
       <Card />
     </>

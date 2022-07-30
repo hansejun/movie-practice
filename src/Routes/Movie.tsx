@@ -17,17 +17,25 @@ const Wrapper = styled.div`
 function Movie() {
   const contentType = "movies";
 
-  const { data: allMovieShow, isLoading: allMovieIsLoading } =
-    useQuery<IMovieResult>([contentType, "now playing"], movieFnArr.movies);
+  const { data: allMovieShow } = useQuery<IMovieResult>(
+    [contentType, "now playing"],
+    movieFnArr.movies
+  );
 
-  const { data: popularMovie, isLoading: popularMovieIsLoading } =
-    useQuery<IMovieResult>([contentType, "popular"], movieFnArr.popular);
+  const { data: popularMovie } = useQuery<IMovieResult>(
+    [contentType, "popular"],
+    movieFnArr.popular
+  );
 
-  const { data: ratedTMovie, isLoading: ratedMovieIsLoading } =
-    useQuery<IMovieResult>([contentType, "topRated"], movieFnArr.topRated);
+  const { data: ratedTMovie } = useQuery<IMovieResult>(
+    [contentType, "topRated"],
+    movieFnArr.topRated
+  );
 
-  const { data: upcomingMovie, isLoading: upcomingMovieIsLoading } =
-    useQuery<IMovieResult>([contentType, "upcoming"], movieFnArr.upcoming);
+  const { data: upcomingMovie } = useQuery<IMovieResult>(
+    [contentType, "upcoming"],
+    movieFnArr.upcoming
+  );
 
   return (
     <>
