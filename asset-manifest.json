@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/movie-practice/static/js/main.d16fdf56.js",
+    "index.html": "/movie-practice/index.html",
+    "main.d16fdf56.js.map": "/movie-practice/static/js/main.d16fdf56.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.d16fdf56.js"
+  ]
+}
