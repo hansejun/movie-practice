@@ -65,19 +65,21 @@ function Search() {
         <Title>Movie</Title>
         <Grid>
           <AnimatePresence>
-            {movieData?.results.map((item) => (
-              <GridItem
-                key={item.id}
-                bgImage={makeImagePath(item.backdrop_path + "")}
-                variants={itemVar}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 1 }}
-              >
-                {item.backdrop_path == undefined ? item.title : null}
-              </GridItem>
-            ))}
+            {movieData?.results
+              .filter((item) => item.backdrop_path != undefined)
+              .map((item) => (
+                <GridItem
+                  key={item.id}
+                  bgImage={makeImagePath(item.backdrop_path + "")}
+                  variants={itemVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 1 }}
+                >
+                  {item.backdrop_path == undefined ? item.title : null}
+                </GridItem>
+              ))}
           </AnimatePresence>
         </Grid>
       </GridParent>
@@ -85,19 +87,24 @@ function Search() {
         <Title>Tv Show</Title>
         <Grid>
           <AnimatePresence>
-            {TvData?.results.map((item) => (
-              <GridItem
-                key={item.id}
-                bgImage={makeImagePath(item.backdrop_path + "")}
-                variants={itemVar}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 1 }}
-              >
-                {item.backdrop_path == undefined ? item.name : null}
-              </GridItem>
-            ))}
+            {TvData?.results
+              .filter(
+                (item) =>
+                  item.backdrop_path != null && item.backdrop_path != undefined
+              )
+              .map((item) => (
+                <GridItem
+                  key={item.id}
+                  bgImage={makeImagePath(item.backdrop_path + "")}
+                  variants={itemVar}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 1 }}
+                >
+                  {item.backdrop_path == undefined ? item.name : null}
+                </GridItem>
+              ))}
           </AnimatePresence>
         </Grid>
       </GridParent>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./Routes/Home";
 import Search from "./Routes/Search";
 import Tv from "./Routes/Tv";
@@ -13,7 +13,6 @@ import { useEffect } from "react";
 function App() {
   const client = new QueryClient();
   const [myContents, setMycontents] = useRecoilState(myContentAtom);
-
   useEffect(() => {
     const a = localStorage.getItem("myContents");
     if (a) {
@@ -33,13 +32,11 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/movie" element={<Movie />} />
-          <Route path="/tv" element={<Tv />} />
-          <Route path="/myContents" element={<MyContents />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/" element={<Home />}>
-            <Route path="movies/:id" element={<Home />} />
-          </Route>
+          <Route path="/movie-practice/movie" element={<Movie />} />
+          <Route path="/movie-practice/tv" element={<Tv />} />
+          <Route path="/movie-practice/myContents" element={<MyContents />} />
+          <Route path="/movie-practice/search" element={<Search />} />
+          <Route path="/movie-practice" element={<Home />} />
         </Routes>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={true} />

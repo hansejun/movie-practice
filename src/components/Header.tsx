@@ -91,16 +91,16 @@ export interface IForm {
 function Header() {
   const [openSearch, setOpenSearch] = useState(false);
   const { scrollY } = useViewportScroll();
-  const tvMatch = useMatch("/tv");
-  const homeMatch = useMatch("/");
-  const movieMatch = useMatch("/movie");
-  const myMatch = useMatch("/myContent");
+  const tvMatch = useMatch("/movie-practice/tv");
+  const homeMatch = useMatch("/movie-practice");
+  const movieMatch = useMatch("/movie-practice/movie");
+  const myMatch = useMatch("/movie-practice/myContent");
   const navAnimation = useAnimation();
   const { register, handleSubmit, setValue } = useForm<IForm>();
   const navigate = useNavigate();
 
   const onValid = (data: IForm) => {
-    navigate(`/search?keyword=${data.keyword}`);
+    navigate(`/movie-practice/search?keyword=${data.keyword}`);
     setValue("keyword", "");
   };
   useEffect(() => {
@@ -115,14 +115,14 @@ function Header() {
 
   return (
     <Nav variants={navVar} animate={navAnimation} initial="initial">
-      <Link to="/">
+      <Link to="/movie-practice">
         <h1>NEWFLIX</h1>
       </Link>
       <NavItem>
         <Col>
           <Item>
             <Link
-              to="/"
+              to="/movie-practice"
               style={{
                 color: homeMatch ? "white" : "rgba(255, 255, 255, 0.7)",
               }}
@@ -132,7 +132,7 @@ function Header() {
           </Item>
           <Item>
             <Link
-              to="/movie"
+              to="/movie-practice/movie"
               style={{
                 color: movieMatch ? "white" : "rgba(255, 255, 255, 0.7)",
               }}
@@ -142,7 +142,7 @@ function Header() {
           </Item>
           <Item>
             <Link
-              to="/tv"
+              to="/movie-practice/tv"
               style={{ color: tvMatch ? "white" : "rgba(255, 255, 255, 0.7)" }}
             >
               TV
@@ -150,7 +150,7 @@ function Header() {
           </Item>
           <Item>
             <Link
-              to="/myContents"
+              to="/movie-practice/myContents"
               style={{ color: myMatch ? "white" : "rgba(255, 255, 255, 0.7)" }}
             >
               My contents

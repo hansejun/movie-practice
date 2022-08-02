@@ -106,7 +106,7 @@ function Home() {
   const navigate = useNavigate();
 
   const onValid = (data: IForm) => {
-    navigate(`/search?keyword=${data.keyword}`);
+    navigate(`/movie-practice/search?keyword=${data.keyword}`);
     setValue("keyword", "");
   };
 

@@ -84,8 +84,8 @@ function MyContents() {
   const [myContents, setMyContents] = useRecoilState(myContentAtom);
   const deleteClick = (id: number) => {
     setMyContents((allContents) => {
-      const idx = allContents.findIndex((item) => item.id == id);
-      return [...allContents.slice(0, idx), ...allContents.slice(idx + 1)];
+      const newContents = allContents.filter((item) => item.id !== id);
+      return [...newContents];
     });
   };
 
